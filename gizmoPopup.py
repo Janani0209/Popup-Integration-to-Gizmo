@@ -6,6 +6,8 @@ import os
 
 numRows = 4
 dropdownValues = ["Forward", "Backward", "Stop", "make an noise", "slow down"] 
+# global array to store values of action peformed by the patient, patient looking at gizmo and gizmo movement
+gizmoEvents = []
 
 
 def on_combobox_select(event, combobox_var):
@@ -23,6 +25,8 @@ def createDropdowns(configure_window):
     comboboxVars = []
     comboboxes = []
 
+
+
 # iterate the loop up to the value above numRows to include the value
     for i in range(1, numRows + 1):
         # stores all the dropdwon values
@@ -37,6 +41,7 @@ def createDropdowns(configure_window):
         comboboxes.append(combobox)
         
     # create inner function for dropdowns by providing access to variables for comboboxes
+    
     def readValuesFromADropdown():
         # initialize the variables to store the action done by patient and whether they are looking the gizmo
         # 1 <- patient is performing an action or looking at gizmo
@@ -44,25 +49,23 @@ def createDropdowns(configure_window):
         actionPerformedByPatient = ["0", "0", "1", "1"]
         patientLookingAtGizmo = ["0", "1", "0", "1"]
 
-
-        
-
-
-
-        
+        config = configparser.ConfigParser()
+        config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configFile.ini')
+        config.read(config_file_path)
 
         for i, var in enumerate(comboboxVars):
             # retrieve the option being selected
             selected_value = var.get()
             
-
-            # Write to config file
-            config = configparser.ConfigParser()
-            config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configFile.ini')
-            config.read(config_file_path)
-            # merge all the variables into one line and writing to config file
-            combinedValues = f"{actionPerformedByPatient[i]}   {patientLookingAtGizmo[i]}   {selected_value}"
-            config["DEFAULT"][f"combinedValues{i}"] = combinedValues
+            if selected_value != "Select an option":
+                 # check if options are selected in the dropdown
+                combinedValues = f"{actionPerformedByPatient[i]}   {patientLookingAtGizmo[i]}   {selected_value}"
+                config["DEFAULT"][f"combinedValues{i}"] = combinedValues
+            else:
+                
+                #default_value = "DefaultValue"
+                option_key = f"{actionPerformedByPatient[i]}   {patientLookingAtGizmo[i]}   {dropdownValues[i]}"
+                config["DEFAULT"][f"combinedValues{i}"] = option_key
 
             # open the config file
             with open(config_file_path, "w") as config_file:
@@ -242,7 +245,3 @@ if __name__ == '__main__':
     
     # Run the Tkinter event loop
    
-
-
-
-    
