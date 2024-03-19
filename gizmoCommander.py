@@ -1,13 +1,22 @@
 # coding=utf8
 import asyncio
+from configparser import ConfigParser
 import gizmoHttpClient
 import argparse
 import sys
 import aiohttp
+import configparser
+import os
 
 # IP of this base station
 # BASE_IP = '10.65.70.129'
 # BASE_IP = '127.0.0.1'
+
+# create global variable
+convert_command = [[[]]]
+# create empty string variable to store the action performed by gizmo
+gizmoAction = ""
+
 
 # seconds between commands
 COMMAND_INTERVAL = 0.5
@@ -95,8 +104,15 @@ async def gizmo_server():
 
 
 async def determineCommand(isJawClenched, isFacingGizmo, gizmoClient):
+    # create variable current command that takes in the parameter isJawClenched and isFacingGizmo
+    #current_command = convert_command[isJawClenched][isFacingGizmo][gizmoAction]
+    #read_file_instructions()
+    #current_command.append(convert_command)
+    current_command = read_file_instructions()
+
+    # call read_file_instructions methods
     # if patient sees gizmo
-    if isJawClenched and isFacingGizmo:
+    '''if isJawClenched and isFacingGizmo:
         await gizmoClient.goForward(NUM_STEPS)
         # move farther forward
     # else if patient is looking at gizmo but doesnt see it
@@ -106,8 +122,50 @@ async def determineCommand(isJawClenched, isFacingGizmo, gizmoClient):
     # else, patient not looking at gizmo! stop gizmo until they look again
     else:
         # stop
-        await gizmoClient.stop()
+        await gizmoClient.stop()'''
 
+def read_file_instructions():
+    # open and read the file
+    # Read the config file
+    config_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configFile.ini')
+    config = configparser.ConfigParser()
+    config.read(config_file_path)
+
+    # Retrieve keys from a specific section (e.g., Section1)
+    section_name = "DEFAULT"
+    keys = list(config[section_name].keys())
+
+    print("Keys in the", section_name, "section:")
+    print(keys)
+    #print('Fruits List: ', fruits)
+    for key in keys:
+        value= config[section_name][key]
+        print(f"Values: {value}")
+    '''config = ConfigParser()
+    config.read('configFile.ini')
+    #sections = config.sections()
+    # create local arrays to store values
+    actionPerformedByPatient = []
+    patientLookingAtGizmo = []
+    gizmoMovements = []
+    # iterate loop till the length of items in the section
+    for key, value in config['DEFAULT'].items():
+        values = values.split()
+        for i, val in enumerate(values):
+            actionPerformedByPatient[i].append(val)
+            patientLookingAtGizmo[i].append(val)
+            gizmoMovements[i].append(val)
+    # append local arrays into a global array
+    convert_command.append(actionPerformedByPatient, patientLookingAtGizmo, gizmoMovements)'''
+        
+
+
+#
+
+    
+
+   
+    # convert into values for the string array convert_commands
 
 async def direct_gizmo(gizmoClient):
     # writer = await asyncio.open_connection(GIZMO_IP, GIZMO_PORT)
